@@ -1,0 +1,26 @@
+{
+  "name": "email-service",
+  "version": "1.0.0",
+  "description": "Microservicio encargado de recibir eventos y enviar correos",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rojasoscar752/email-service.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rojasoscar752/email-service/issues"
+  },
+  "homepage": "https://github.com/rojasoscar752/email-service#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "kafkajs": "^2.2.4",
+    "nodemailer": "^7.0.10"
+  }
+}
