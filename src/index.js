@@ -1,6 +1,5 @@
 require('dotenv').config();
 const express = require('express');
-const config = require('./config/env');
 const logger = require('./utils/logger');
 const { connectConsumer, subscribeToReportVisited, disconnectConsumer } = require('./kafka/consumer');
 const { sendReportVisitedEmail } = require('./services/emailService');
@@ -31,8 +30,10 @@ async function startService() {
   }
 }
 
-const server = app.listen(config.port, () => {
-  logger.info(`Email-service API corriendo en http://localhost:${config.port}`);
+const port = process.env.PORT || 3002;
+
+const server = app.listen(port, () => {
+  logger.info(`Email-service API corriendo en http://localhost:${port}`);
 });
 
 // Iniciar el consumer

@@ -1,5 +1,6 @@
 const kafka = require('../config/kafka');
-const { sendEmail } = require('../services/email.service');
+const logger = require('../utils/logger');
+const { sendEmail } = require('../services/email.services');
 
 const consumer = kafka.consumer({ groupId: 'email-consumer-group' });
 
@@ -7,19 +8,24 @@ async function emailConsumer() {
   await consumer.connect();
 
   await consumer.subscribe({
-    topic: 'email-notification',
+    topic: 'report-visited',
     fromBeginning: false,
   });
 
-  console.log("Email Service escuchando el tópico: email-notification");
+  logger.info('Email Service escuchando el tópico: report-visited');
 
   await consumer.run({
     eachMessage: async ({ message }) => {
-      const data = JSON.parse(message.value.toString());
+      try {
+        const data = JSON.parse(message.value.toString());
 
-      console.log("Evento recibido desde Kafka:", data);
+        logger.info('Evento recibido desde Kafka', { data });
 
-      await sendEmail(data);
+        await sendEmail(data);
+        logger.info('Procesado evento y enviado email', { to: data.to || process.env.EMAIL_ADMIN });
+      } catch (err) {
+        logger.error('Error procesando mensaje de consumer', { error: err.message, stack: err.stack });
+      }
     },
   });
 }
