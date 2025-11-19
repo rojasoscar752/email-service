@@ -1,51 +1,30 @@
-const winston = require('winston');
-const path = require('path');
+const winston = require("winston");
 
-// Crear directorio de logs si no existe
-const fs = require('fs');
-const logsDir = path.join(__dirname, '../../logs');
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
-}
-
-// Definir formato personalizado
-const customFormat = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  winston.format.errors({ stack: true }),
-  winston.format.printf(({ timestamp, level, message, stack, ...meta }) => {
-    let metaStr = '';
-    if (Object.keys(meta).length > 0) {
-      metaStr = ` ${JSON.stringify(meta)}`;
-    }
-    if (stack) {
-      return `[${timestamp}] ${level.toUpperCase()}: ${message}\n${stack}${metaStr}`;
-    }
-    return `[${timestamp}] ${level.toUpperCase()}: ${message}${metaStr}`;
-  })
-);
-
-// Crear logger
 const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || 'info',
-  format: customFormat,
-  defaultMeta: { service: 'email-service' },
+  level: "info",
   transports: [
     new winston.transports.Console({
       format: winston.format.combine(
-        winston.format.colorize(),
-        customFormat
+        winston.format.timestamp({
+          format: () => {
+            return new Date().toLocaleString("es-CO", {
+              timeZone: "America/Bogota",
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+              second: "2-digit",
+              fractionalSecondDigits: 3,
+              hour12: false,
+              timeZoneName: "short",
+            });
+          },
+        }),
+        winston.format.printf(
+          ({ level, message, timestamp }) => `${timestamp} ${level}: ${message}`
+        )
       ),
-    }),
-    new winston.transports.File({
-      filename: path.join(logsDir, 'error.log'),
-      level: 'error',
-      maxsize: 5242880, // 5MB
-      maxFiles: 5,
-    }),
-    new winston.transports.File({
-      filename: path.join(logsDir, 'combined.log'),
-      maxsize: 5242880, // 5MB
-      maxFiles: 5,
     }),
   ],
 });
